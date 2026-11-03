@@ -1,0 +1,4 @@
+shots/
+.claude/
+__pycache__/
+*.pyc

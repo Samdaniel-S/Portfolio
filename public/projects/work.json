@@ -1,0 +1,17 @@
+{
+  "about": "The twelve screens of the project universe. Edit a title, category, year or line here, or set image to a file under public/projects/art/ (e.g. \"art/identity.jpg\"; a landscape picture, it is cover-cropped into the right of the screen), then run: python tools/reskin_s4.py. Set url to make the screen a link that opens that site in a new tab (read at runtime, no re-run needed). Leave year empty to show the category alone. Screens without a real project show what the owner builds (category AI, Automation, 3D or Web draws a matching motif). The ids are fixed: they name the measured screen each project sits on (p03 is the hero screen, p05-p09 the small far row, p11/p12 the near flanks).",
+  "cards": [
+    { "id": "p01_timeless", "title": "Red Sea Motors", "category": "Web", "year": "2024", "line": "Car sales & self-drive rentals", "image": "art/redsea-motors.jpg", "url": "https://redseamotors.in/" },
+    { "id": "p02_game", "title": "AI Agents", "category": "AI", "year": "", "line": "Agents that take on real tasks", "image": "" },
+    { "id": "p03_build", "title": "Ichthus Creative", "category": "Web", "year": "2026", "line": "Websites for local businesses", "image": "art/ichthus-creative.jpg", "url": "https://ichthuscreative.com/en" },
+    { "id": "p04_driven", "title": "Pondicherry Cabs", "category": "Web", "year": "2026", "line": "24/7 taxis, booked on WhatsApp", "image": "art/pondicherry-cabs.jpg", "url": "https://www.pondicherrycabs.in/" },
+    { "id": "p05_ideas", "title": "AI Chatbots", "category": "AI", "year": "", "line": "", "image": "" },
+    { "id": "p06_sound", "title": "Automations", "category": "Automation", "year": "", "line": "", "image": "" },
+    { "id": "p07_food", "title": "Web Apps", "category": "Web", "year": "", "line": "", "image": "" },
+    { "id": "p08_travel", "title": "3D & WebGL", "category": "3D", "year": "", "line": "", "image": "" },
+    { "id": "p09_space", "title": "Online Stores", "category": "Web", "year": "", "line": "", "image": "" },
+    { "id": "p10_play", "title": "XPath Forte", "category": "Web", "year": "2025", "line": "A Chrome extension for QA teams", "image": "art/xpath-forte.jpg", "url": "https://samdaniel-s.github.io/XpathForte/" },
+    { "id": "p11_cleaner", "title": "KMS Global Enterprises", "category": "Web", "year": "2026", "line": "Recruitment across 20 industries", "image": "art/kms-global.jpg", "url": "https://www.kmsglobalenterprises.com/" },
+    { "id": "p12_steps", "title": "Bistro’96", "category": "Web", "year": "2026", "line": "Home-kitchen menu & ordering", "image": "art/bistro96.jpg", "url": "https://www.bistro96.in/" }
+  ]
+}
