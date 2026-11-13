@@ -30,10 +30,10 @@ TEX = os.path.join(ROOT, "public", "tex")
 # The walking man is the only clip that appears on the site. The other two
 # sources stay in assets_src/ and their presets stay in matte.py, so re-enabling
 # either is a one-line change plus a rebuild.
-# The hero walk ends at frame 171: past it his feet leave the frame as he
-# reaches the camera, and the site anchors the figure by its feet.
+# The hero plays the whole walk. His feet leave the frame at ~5 s as he reaches
+# the camera; track.py holds the anchor from there (see hold_after_exit).
 CLIPS = [
-    ("hero", "v1.mp4", "v1", 720, 1280, 0, 171),
+    ("hero", "v1.mp4", "v1", 720, 1280, 0, 302),
     # ("letter_g", "v2.mp4", "v2", 540, 960, 0, 240),
     # ("letter_h", "v3.mov", "v3", 540, 960, 0, 190),
 ]

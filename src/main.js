@@ -85,7 +85,8 @@ async function main() {
       w: c.w, h: c.h, track: c.track, loopFade,
     });
   };
-  app.clips.hero = mk('hero', 0.7);
+  // the whole walk plays and loops on a straight cut, with no dip to black
+  app.clips.hero = mk('hero', 0);
 
   layout();
   window.addEventListener('resize', debounce(layout, 140));
@@ -146,7 +147,8 @@ function begin() {
       window.addEventListener('resize', debounce(renderStill, 160));
     };
     c.el.addEventListener('seeked', still, { once: true });
-    c.el.currentTime = Math.min(6, (c.duration || 8) * 0.6);
+    // held while still full-length: later in the walk his legs leave the frame
+    c.el.currentTime = Math.min(4, (c.duration || 8) * 0.4);
     return;
   }
   requestAnimationFrame(frame);

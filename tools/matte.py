@@ -289,22 +289,56 @@ def frame_alpha(bgr, cfg):
     # as white ghosts under his feet on the site. In that band, faint alpha is
     # crushed while anything solid (the shoes themselves) is left alone.
     # Pinholes. Glossy shoes throw near-white highlights that key as backdrop and
-    # punch dots through the toe cap. Small holes enclosed by the subject in the
-    # lower half are filled; the hair gaps (top) and the bent-arm gap (large)
-    # stay open.
+    # punch dots through the toe cap, and close to camera the key light lifts
+    # his forehead and cheek to backdrop brightness. Two kinds of enclosed hole
+    # are filled: small ones in the feet zone (shoe shine) or deep on his centre
+    # line (button shine), and skin-coloured ones away from the outline
+    # (face_holes; lit skin stays 12-17 off neutral where backdrop seen through
+    # a gap reads 0-3). Gaps between hair strands and between arm and body are
+    # backdrop-coloured and off the centre line, so they stay open.
     ph = cfg.get("pinhole", 0)
-    if ph > 0:
+    fh = cfg.get("face_holes", 0)
+    if ph > 0 or fh > 0:
         body = (a > 0.5).astype(np.uint8)
-        holes = fill_holes(body).astype(bool) & ~body.astype(bool)
-        n_h, lab_h, st_h, _ch = cv2.connectedComponentsWithStats(
+        enclosed = fill_holes(body)
+        holes = enclosed.astype(bool) & ~body.astype(bool)
+        n_h, lab_h, st_h, cen_h = cv2.connectedComponentsWithStats(
             holes.astype(np.uint8), 8)
-        small = [i for i in range(1, n_h) if st_h[i, cv2.CC_STAT_AREA] <= ph
-                 and st_h[i, cv2.CC_STAT_TOP] > h // 2]
+        rows = np.nonzero(body.any(1))[0]
+        cols = np.nonzero(body.any(0))[0]
+        feet = rows[-1] - 0.12 * (rows[-1] - rows[0]) if len(rows) else h
+        mid = (cols[0] + cols[-1]) * 0.5 if len(cols) else w * 0.5
+        half = 0.12 * (cols[-1] - cols[0]) if len(cols) else 0
+        inside = cv2.distanceTransform(enclosed, cv2.DIST_L2, 3)
+
+        small = []
+        for i in range(1, n_h):
+            area = st_h[i, cv2.CC_STAT_AREA]
+            if area <= ph and st_h[i, cv2.CC_STAT_TOP] > feet:
+                small.append(i)
+            elif (area <= ph and abs(cen_h[i][0] - mid) <= half
+                  and inside[lab_h == i].min() >= 20):
+                small.append(i)
+            elif area <= fh:
+                m = lab_h == i
+                if dC[m].mean() >= 8.0 and inside[m].min() >= 8:
+                    small.append(i)
         if small:
             # grown 2px so the hole's own soft rim does not stay as a red ring
             fill = cv2.dilate(np.isin(lab_h, small).astype(np.uint8),
                               np.ones((3, 3), np.uint8), iterations=2)
             a[fill.astype(bool)] = 1.0
+
+    # Solid core. Lit skin close to camera keys at only 0.6-0.9 coverage, so the
+    # red behind shows through his cheek, and a filled highlight then reads as an
+    # opaque blotch on a see-through face. Well inside the silhouette coverage
+    # is total; only the outer `core` px (hair, edges, open gaps) keep their
+    # soft alpha.
+    core = cfg.get("core", 0)
+    if core > 0:
+        k_c = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,
+                                        (2 * core + 1, 2 * core + 1))
+        a[cv2.erode((a > 0.5).astype(np.uint8), k_c).astype(bool)] = 1.0
 
     # Islands. Floor specks and shoe reflections can key as small blobs beside
     # his feet; with a single subject, anything not attached to him is dropped.
@@ -413,12 +447,15 @@ PRESETS = {
     # dark suit + black shirt on bright cyclorama, subject walks toward camera.
     # This backdrop is ~25 L darker round him than at the frame border, so the
     # border-fit plate reads it as faintly "subject": thresholds sit above that
-    # gap (the original model's clip keyed at lo=12/hi=46, bg 10/fg 52).
-    "v1": dict(ring=14, ring_min_L=150, w_lum=1.0, w_chroma=1.6, lo=60, hi=110,
+    # gap (the original model's clip keyed at lo=12/hi=46, bg 10/fg 52). Close
+    # to camera his lit skin is as bright as the backdrop and only its colour
+    # (17-25 off neutral vs 1-4) tells them apart, hence the heavy chroma weight.
+    "v1": dict(ring=14, ring_min_L=150, w_lum=1.0, w_chroma=4.5, lo=60, hi=110,
                bg_thr=55, fg_thr=110, edge_barrier=0, seed_edges="ltrb",
                band=26, seal=9, hole_min=0, gf_radius=4, gf_eps=1e-4, choke=0.06,
                out_lo=0.14, out_hi=0.96, despill=1.0, unmul_floor=0.22,
-               est_win=17, ema=0.55, pinhole=400, drop_islands=1,
+               est_win=17, ema=0.55, pinhole=400, face_holes=8000, core=6,
+               drop_islands=1,
                floor_guard=0.06, floor_track=1),
     # black top + CREAM trousers + WHITE sneakers on pure white
     "v2": dict(ring=10, ring_min_L=200, w_lum=1.0, w_chroma=2.6, lo=15, hi=32,

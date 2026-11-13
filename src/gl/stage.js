@@ -249,6 +249,9 @@ export class Stage {
     // also disposes of the floor highlight the key could not fully remove
     gl.uniform1f(p.u.uFeetFade, 0.085);
     gl.uniform1f(p.u.uTopFade, 0.012);
+    // near the end of the walk his shoulder reaches the edge of the source
+    // frame; a soft side edge keeps that from reading as a vertical cut
+    gl.uniform1f(p.u.uSideFade, 0.06);
     gl.uniform1f(p.u.uExposure, 1.24);
     gl.uniform1f(p.u.uLift, 1.35);
     // standing in front of a wall of red, the bounce onto his silhouette is

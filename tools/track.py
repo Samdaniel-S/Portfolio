@@ -45,7 +45,32 @@ def track(path, w):
     pad = np.pad(arr, ((k // 2, k // 2), (0, 0)), mode="edge")
     sm = np.stack([np.convolve(pad[:, i], np.ones(k) / k, "valid")
                    for i in range(4)], 1)
-    return np.round(sm, 4).tolist()
+    return np.round(hold_after_exit(sm), 4).tolist()
+
+
+def hold_after_exit(sm, edge=0.975, ease=24):
+    """Freeze the anchor once his feet reach the bottom of the frame.
+
+    The runtime holds him at a fixed height by his feet; when a walk ends close
+    to camera the feet leave the frame, and anchoring by the cut-off edge would
+    shrink him and stand the cut on the floor line. From that frame on the box
+    is held, so he grows naturally as he approaches and his legs sink into the
+    shader's feet fade. The corner where tracking stops and the hold starts is
+    averaged over `ease` frames, so the growth starts gradually instead of
+    with a jolt (both ends of that window already match, so nothing jumps)."""
+    hit = np.nonzero(sm[:, 3] >= edge)[0]
+    if not len(hit):
+        return sm
+    e = int(hit[0])
+    out = sm.copy()
+    out[e:] = sm[e]
+    h = ease // 2
+    pad = np.pad(out, ((h, h), (0, 0)), mode="edge")
+    avg = np.stack([np.convolve(pad[:, i], np.ones(2 * h + 1) / (2 * h + 1), "valid")
+                    for i in range(4)], 1)
+    lo, hi = max(0, e - h), min(len(out), e + h + 1)
+    out[lo:hi] = avg[lo:hi]
+    return out
 
 
 def main():

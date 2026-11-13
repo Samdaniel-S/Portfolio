@@ -145,6 +145,7 @@ uniform float uOpacity;
 uniform float uReveal;
 uniform float uFeetFade;      // dissolve the floor contact into darkness
 uniform float uTopFade;
+uniform float uSideFade;      // soften the source frame's left/right edges
 uniform float uExposure;
 uniform float uLift;          // shadow lift toward cool blue
 uniform float uRimRed;        // bounce from the red typography
@@ -199,6 +200,9 @@ void main(){
   }
   a *= smoothstep(0.0, uFeetFade, 1.0 - vLocal.y);
   a *= smoothstep(0.0, uTopFade, vLocal.y);
+  if(uSideFade > 0.0){
+    a *= smoothstep(0.0, uSideFade, vLocal.x) * smoothstep(0.0, uSideFade, 1.0 - vLocal.x);
+  }
 
   // Glossy-floor band of the source frame. Reflections and specular smears
   // around the shoes survive the key with high alpha, so gating coverage alone
