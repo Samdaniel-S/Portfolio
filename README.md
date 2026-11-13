@@ -46,9 +46,7 @@ hand across 2021–2026, and whichever year it points at lights up.
 
 - **Hero (walking figure):** done. `assets_src/v1.mp4` is now the owner's own
   walk, generated with Higgsfield. It came in at 1080×1920, 30 fps, and the
-  site plays all 10 s on a loop with a straight cut (no dip to black). His feet
-  leave the frame at ~5 s; from there `track.py` holds the anchor, so he
-  grows as he approaches and his legs sink into the shader's feet fade. To
+  site uses frames 0–171, the stretch before the feet leave the frame. To
   replace it, see *Replacing the videos later*.
 - **Finale (portrait):** done. The figure in front of the wordmark is the
   owner's studio portrait, `assets_src/fin_portrait.png` (white backdrop).
@@ -129,9 +127,8 @@ dissolve at the video's loop point so the cut is never visible.
    ```
 
    A new clip usually needs its preset in `tools/matte.py` re-tuned:
-   `lo`/`hi`/`bg_thr`/`fg_thr` for the backdrop, `w_chroma` when lit skin is
-   as bright as the backdrop, `pinhole`/`face_holes`/`core` for highlights
-   that key as holes, and `drop_islands` and `floor_guard` for floor marks. Test on single frames
+   `lo`/`hi`/`bg_thr`/`fg_thr` for the backdrop, `pinhole` for shoe shine,
+   `drop_islands` and `floor_guard` for floor marks. Test on single frames
    with `frame_alpha` first; a full pass at 1080p takes minutes.
 
 That regenerates `public/media/*` (packed clips, posters, `manifest.json` with
